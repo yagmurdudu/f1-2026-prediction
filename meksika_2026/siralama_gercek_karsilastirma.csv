@@ -1,0 +1,23 @@
+gercek_sira,kod,pilot,takim,tahmin_sira,fark,beklenen_sira,pole,q3,baslangic_sirasi
+1,HAM,Hamilton,Ferrari,1,0,4.4,0.1616,0.9403,1
+2,RUS,Russell,Mercedes,3,1,4.5,0.1608,0.9454,2
+3,LEC,Leclerc,Ferrari,4,1,4.7,0.1352,0.9441,3
+4,VER,Verstappen,Red Bull,2,-2,4.5,0.1765,0.9468,5
+5,ANT,Antonelli,Mercedes,5,0,5.0,0.1394,0.9043,4
+6,NOR,Norris,McLaren,6,0,5.8,0.0811,0.9252,6
+7,HAD,Hadjar,Red Bull,8,1,7.8,0.0498,0.8164,7
+8,LAW,Lawson,Racing Bulls,10,2,10.6,0.0064,0.5348,9
+9,LIN,Lindblad,Racing Bulls,11,2,10.9,0.0044,0.511,8
+10,GAS,Gasly,Alpine,9,-1,9.8,0.0354,0.5688,10
+11,HUL,Hulkenberg,Audi,12,1,12.2,0.0008,0.338,11
+12,COL,Colapinto,Alpine,13,1,12.5,0.0012,0.2487,12
+13,PIA,Piastri,McLaren,7,-6,6.7,0.0474,0.9118,13
+14,BOR,Bortoleto,Audi,14,0,13.2,0.0,0.1955,14
+15,BEA,Bearman,Haas,15,0,14.7,0.0,0.1226,15
+16,SAI,Sainz,Williams,17,1,16.2,0.0,0.0273,16
+17,ALB,Albon,Williams,20,3,18.6,0.0,0.0021,17
+18,ALO,Alonso,Aston Martin,18,0,16.6,0.0,0.0717,18
+19,OCO,Hirakawa (Ocon yerine),Haas,16,-3,15.4,0.0,0.0422,19
+20,STR,Stroll,Aston Martin,19,-1,18.4,0.0,0.0028,20
+21,PER,Perez,Cadillac,22,1,20.4,0.0,0.0,21
+22,BOT,Bottas,Cadillac,21,-1,19.9,0.0,0.0,22

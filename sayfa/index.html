@@ -1,0 +1,719 @@
+<meta name="dash-one-writer">
+<style>
+  .f1 { display: flex; flex-direction: column; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); }
+  .f1 h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .f1 h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+  .f1 h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .f1 p { margin: 0; max-width: 72ch; }
+  .f1 .f1-ust { display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+  .f1 .f1-not { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .f1 b { font-weight: 600; }
+  .f1 .f1-sekmeler { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+  .f1 .f1-sekme { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--color-fg-muted); font: inherit; font-size: var(--cds-font-size-body); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; margin-bottom: -1px; }
+  .f1 .f1-sekme[aria-selected="true"] { color: var(--color-fg); border-bottom-color: currentColor; font-weight: var(--cds-font-weight-medium); }
+  .f1 .f1-sekme:focus-visible, .f1 .f1-secim button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .f1 .f1-bolum { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+  .f1 .f1-kartlar { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+  .f1 .f1-kart, .f1 .f1-panel { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+  .f1 .f1-etiket { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f1 .f1-sayi { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .f1 .f1-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+  .f1 .f1-genis { grid-column: 1 / -1; }
+  .f1 .f1-cizim { position: relative; min-height: 300px; }
+  .f1 .f1-cizim svg { display: block; overflow: visible; }
+  .f1 .f1-ipucu { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 2; display: flex; flex-direction: column; gap: 2px; }
+  .f1 .f1-ik { color: var(--cds-text-secondary); }
+  .f1 .f1-ipucu .f1-sat { display: flex; align-items: center; gap: var(--cds-gap-xs); }
+  .f1 .f1-lejant { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f1 .f1-lejant span { display: inline-flex; align-items: center; gap: var(--cds-gap-xs); }
+  .f1 .f1-sw { width: 0.75rem; height: 0.75rem; border-radius: 2px; display: inline-block; flex: none; }
+  .f1 .f1-sw-a { background: var(--f1-a, var(--color-fg)); }
+  .f1 .f1-sw-b { background: var(--f1-a, var(--color-fg)); opacity: .35; }
+  .f1 .f1-sw-c { width: 1rem; height: 2px; background: var(--color-fg-muted); border-radius: 0; }
+  .f1 .f1-sw-d { width: 1rem; height: 0; border-top: 2px dashed var(--color-fg-muted); border-radius: 0; }
+  .f1 .f1-kaydir { overflow-x: auto; }
+  .f1 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-body); }
+  .f1 th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .f1 td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
+  .f1 .f1-sag { text-align: right; }
+  .f1 td.f1-hucre { text-align: center; min-width: 3.2rem; }
+  .f1 .f1-bar-satir { display: grid; grid-template-columns: minmax(0, 1fr) minmax(4rem, 8rem) 3rem; align-items: center; gap: var(--cds-gap-sm); font-size: var(--cds-font-size-caption); padding-block: 3px; }
+  .f1 .f1-bar-iz { height: 10px; background: var(--cds-chart-grid); border-radius: var(--cds-radius); overflow: hidden; }
+  .f1 .f1-bar-dolu { height: 100%; border-radius: var(--cds-radius); }
+  .f1 .f1-hata { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); min-height: inherit; }
+  .f1 .f1-nokta { width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+  .f1 [data-dash-source-state=empty] { color: transparent; }
+  .f1 [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+  .f1 ol { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: var(--cds-gap-xs); max-width: 72ch; }
+  .f1 .f1-secim { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); }
+  .f1 .f1-secim button { appearance: none; font: inherit; font-size: var(--cds-font-size-caption); padding: var(--cds-pad-xs) var(--cds-pad-md); border: 1px solid var(--color-border-line); border-radius: 999px; background: var(--color-bg); color: var(--color-fg); cursor: pointer; }
+  .f1 .f1-secim button[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+  .f1 .f1-profil { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--cds-gap-sm) var(--cds-gap-lg); }
+  .f1 .f1-olcer { display: flex; flex-direction: column; gap: 4px; font-size: var(--cds-font-size-caption); }
+  .f1 .f1-olcer-ust { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); }
+  .f1 .f1-olcer-ust span:last-child { color: var(--color-fg-muted); }
+  .f1 .f1-kucukler { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--cds-gap-md); }
+  .f1 .f1-kucuk { display: flex; flex-direction: column; gap: 2px; font-size: var(--cds-font-size-caption); }
+  .f1 .f1-kucuk svg { display: block; }
+</style>
+
+<div class="f1" id="f1-sayfa">
+  <header class="f1-ust">
+    <h1>F1 2026 Şampiyonluk Tahmini</h1>
+    <p><b data-draw="lider" data-source="tahmin" data-field="pilot" data-row="0">—</b>, simülasyonların <b data-draw="liderp" data-source="tahmin" data-field="sampiyon" data-row="0">—</b> kadarında şampiyon. Asıl çekişme ikincilik için: en güçlü aday <b data-draw="ikinci" data-source="ikinci" data-field="pilot">—</b>, ama ikinci bitirme ihtimali sadece <b data-draw="ikincip" data-source="ikinci" data-field="oran">—</b>.</p>
+    <p class="f1-not"><span data-draw="sontur" data-source="ozet" data-field="son_tur">—</span>. yarıştan (ABD GP) sonraki puanlarla hesaplandı. Model 2: önce sıralama turu, sonra yarış tahmin ediliyor; sezon <span data-draw="nsim">—</span> kez simüle edildi.</p>
+  </header>
+
+  <nav class="f1-sekmeler" role="tablist" aria-label="Bölümler">
+    <button class="f1-sekme" role="tab" type="button" id="sekme-sampiyonluk" data-sekme="sampiyonluk" aria-selected="true">Şampiyonluk</button>
+    <button class="f1-sekme" role="tab" type="button" id="sekme-yarislar" data-sekme="yarislar" aria-selected="false">Yarış yarış</button>
+    <button class="f1-sekme" role="tab" type="button" id="sekme-takimlar" data-sekme="takimlar" aria-selected="false">Takımlar</button>
+    <button class="f1-sekme" role="tab" type="button" id="sekme-model" data-sekme="model" aria-selected="false">Model</button>
+  </nav>
+
+  <!-- ================= ŞAMPİYONLUK ================= -->
+  <section class="f1-bolum" id="sampiyonluk" role="tabpanel" aria-labelledby="sekme-sampiyonluk">
+    <div class="f1-kartlar">
+      <div class="f1-kart">
+        <span class="f1-etiket">Antonelli'nin şampiyonluk olasılığı</span>
+        <span class="f1-sayi" data-draw="k-sampiyon" data-source="tahmin" data-field="sampiyon" data-where="kod=ANT">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Bir sonraki yarışta kesinleşme olasılığı</span>
+        <span class="f1-sayi" data-draw="k-kesin" data-source="kesinlesme" data-field="toplam" data-row="0">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Lider ile 2. arası puan farkı</span>
+        <span class="f1-sayi" data-draw="k-fark" data-source="ozet" data-field="fark">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Kalan yarış</span>
+        <span class="f1-sayi" data-draw="k-kalan" data-source="ozet" data-field="kalan_yaris">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Kalan en fazla puan (yarış başına 25)</span>
+        <span class="f1-sayi" data-draw="k-max" data-source="ozet" data-field="max_puan">—</span>
+      </div>
+    </div>
+
+    <div class="f1-izgara">
+      <section class="f1-panel f1-genis" id="ilerleme">
+        <h2>Sezon boyunca puan</h2>
+        <p class="f1-not">Düz çizgi gerçekleşen puan, kesikli çizgi modelin kalan yarışlar için beklediği ortalama.</p>
+        <div class="f1-lejant">
+          <span><i class="f1-sw f1-sw-c"></i>Gerçekleşen</span>
+          <span><i class="f1-sw f1-sw-d"></i>Tahmin</span>
+        </div>
+        <div class="f1-cizim" data-draw="ilerleme" data-source="ilerleme"></div>
+      </section>
+
+      <section class="f1-panel f1-genis" id="final-puan">
+        <h2>Beklenen sezon sonu puanı</h2>
+        <p class="f1-not">Koyu kısım bugünkü puan, açık kısım kalan yarışlardan beklenen puan. Çizgi, simülasyonların %80'inin düştüğü aralık.</p>
+        <div class="f1-lejant">
+          <span><i class="f1-sw f1-sw-a"></i>Bugünkü puan</span>
+          <span><i class="f1-sw f1-sw-b"></i>Beklenen ek puan</span>
+          <span><i class="f1-sw f1-sw-c"></i>%10 – %90 aralığı</span>
+        </div>
+        <div class="f1-cizim" data-draw="puanlar" data-source="tahmin"></div>
+      </section>
+
+      <section class="f1-panel" id="siralama">
+        <h2>Sezonu kaçıncı bitirir?</h2>
+        <p class="f1-not">Her hücre, pilotun o sırada bitirdiği simülasyonların oranı.</p>
+        <div class="f1-kaydir">
+          <table data-source="tahmin" data-row-key="kod">
+            <thead><tr>
+              <th data-field="pilot">Pilot</th>
+              <th data-field="s1" class="f1-sag">1.</th>
+              <th data-field="s2" class="f1-sag">2.</th>
+              <th data-field="s3" class="f1-sag">3.</th>
+              <th data-field="s4" class="f1-sag">4.</th>
+              <th data-field="s5" class="f1-sag">5.</th>
+              <th data-field="s6" class="f1-sag">6.</th>
+            </tr></thead>
+            <tbody data-draw="olasilik"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="f1-panel" id="kesinlesme">
+        <h2>Şampiyonluk hangi yarışta kesinleşir?</h2>
+        <p class="f1-not">Liderin farkı, kalan yarışlarda alınabilecek en fazla puanı geçtiği ya da ona eşit olup galibiyet sayısıyla garantilendiği an.</p>
+        <div class="f1-kaydir">
+          <table data-source="kesinlesme" data-row-key="tur">
+            <thead><tr>
+              <th data-field="tur">Tur</th>
+              <th data-field="yaris">Yarış</th>
+              <th data-field="bu_yarista" class="f1-sag">Bu yarışta</th>
+              <th data-field="toplam" class="f1-sag">Bu yarışa kadar</th>
+            </tr></thead>
+            <tbody data-draw="kesinlesme"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="f1-panel" id="meksika">
+        <h2>Meksika'da Antonelli kaçıncı olursa?</h2>
+        <p class="f1-not">Antonelli'nin bugünkü sırasına göre şampiyonluğu bugün garantileme ihtimali. Russell'ın ve diğerlerinin sonucu da simülasyonda değişiyor.</p>
+        <div class="f1-kaydir">
+          <table data-source="meksika" data-row-key="sira">
+            <thead><tr>
+              <th data-field="sira">Antonelli'nin sırası</th>
+              <th data-field="olasilik" class="f1-sag">Bu sırada bitirme</th>
+              <th data-field="kesinlesir" class="f1-sag">Bugün şampiyon</th>
+            </tr></thead>
+            <tbody data-draw="meksika"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="f1-panel" id="dagilim">
+        <h2>Sezon sonu puan dağılımı</h2>
+        <p class="f1-not">Simülasyonlarda her pilotun bitirdiği puan. Hepsi aynı ölçekte; üst üste binen dağılımlar sıralamanın belirsiz olduğunu gösteriyor.</p>
+        <div class="f1-kucukler" data-draw="dagilim" data-source="dagilim"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= YARIŞ YARIŞ ================= -->
+  <section class="f1-bolum" id="yarislar" role="tabpanel" aria-labelledby="sekme-yarislar" hidden>
+    <section class="f1-panel" id="kazanma-isi">
+      <h2>Kalan yarışları kim kazanır?</h2>
+      <p class="f1-not">Her hücre, pilotun o yarışı kazandığı simülasyonların oranı. Pistler arasındaki fark küçük, çünkü 2026'nın yeni kurallarıyla her pistte sadece bir yarış koşuldu.</p>
+      <div class="f1-kaydir" data-draw="kazanma-isi" data-source="yarislar"></div>
+    </section>
+
+    <section class="f1-panel" id="yaris-detay">
+      <h2>Yarış detayı</h2>
+      <div class="f1-secim" data-draw="yaris-sec" data-source="kalan" role="group" aria-label="Yarış seçimi"></div>
+      <h3>Pist profili</h3>
+      <div class="f1-profil" data-draw="profil" data-source="pistler"></div>
+      <h3>Pilot olasılıkları</h3>
+      <p class="f1-not">Pist etkisi: pilotun 2026'da bu piste benzeyen yerlerde kendi ortalamasından kaç sıra daha iyi bitirdiği (artı iyi, eksi kötü).</p>
+      <div class="f1-kaydir">
+        <table data-source="yarislar" data-row-key="tur,kod">
+          <thead><tr>
+            <th data-field="pilot">Pilot</th>
+            <th data-field="grid_bek" class="f1-sag">Beklenen grid</th>
+            <th data-field="pole" class="f1-sag">Pole</th>
+            <th data-field="kazanma" class="f1-sag">Kazanma</th>
+            <th data-field="podyum" class="f1-sag">Podyum</th>
+            <th data-field="puan_alma" class="f1-sag">Puan alma</th>
+            <th data-field="dnf" class="f1-sag">Yarış dışı</th>
+            <th data-field="beklenen_puan" class="f1-sag">Beklenen puan</th>
+            <th data-field="pist_etkisi" class="f1-sag">Pist etkisi</th>
+          </tr></thead>
+          <tbody data-draw="yaris-tablo"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= TAKIMLAR ================= -->
+  <section class="f1-bolum" id="takimlar" role="tabpanel" aria-labelledby="sekme-takimlar" hidden>
+    <div class="f1-izgara">
+      <section class="f1-panel f1-genis" id="takim-puan">
+        <h2>Takımlar şampiyonası: beklenen sezon sonu</h2>
+        <p class="f1-not">İki pilotun simüle edilen puanlarının toplamı. Çizgi, simülasyonların %80'inin düştüğü aralık.</p>
+        <div class="f1-lejant">
+          <span><i class="f1-sw f1-sw-a"></i>Bugünkü puan</span>
+          <span><i class="f1-sw f1-sw-b"></i>Beklenen ek puan</span>
+          <span><i class="f1-sw f1-sw-c"></i>%10 – %90 aralığı</span>
+        </div>
+        <div class="f1-cizim" data-draw="takim-bar" data-source="takimlar"></div>
+      </section>
+      <section class="f1-panel f1-genis" id="takim-sira">
+        <h2>Takımlar sezonu kaçıncı bitirir?</h2>
+        <p class="f1-not">Asıl çekişme 3.lük için: Red Bull ve McLaren aynı puanda.</p>
+        <div class="f1-kaydir">
+          <table data-source="takimlar" data-row-key="takim">
+            <thead><tr>
+              <th data-field="takim">Takım</th>
+              <th data-field="mevcut" class="f1-sag">Puan</th>
+              <th data-field="beklenen" class="f1-sag">Beklenen</th>
+              <th data-field="s1" class="f1-sag">1.</th>
+              <th data-field="s2" class="f1-sag">2.</th>
+              <th data-field="s3" class="f1-sag">3.</th>
+              <th data-field="s4" class="f1-sag">4.</th>
+              <th data-field="s5" class="f1-sag">5.</th>
+            </tr></thead>
+            <tbody data-draw="takim-tablo"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= MODEL ================= -->
+  <section class="f1-bolum" id="model" role="tabpanel" aria-labelledby="sekme-model" hidden>
+    <div class="f1-izgara">
+      <section class="f1-panel f1-genis" id="dogrulama">
+        <h2>Model ne kadar iyi?</h2>
+        <p class="f1-not">Her yöntem 2026'nın 13–18. yarışlarını hiç görmeden tahmin etti. Ortalama hata: tahmin ile gerçek sıra arasındaki fark (düşük daha iyi). Sıralama uyumu: 1 kusursuz sıralama (yüksek daha iyi).</p>
+        <div class="f1-kaydir">
+          <table data-source="dogrulama" data-row-key="yontem">
+            <thead><tr>
+              <th data-field="yontem">Yöntem</th>
+              <th data-field="mae" class="f1-sag">Ortalama hata (sıra)</th>
+              <th data-field="spearman" class="f1-sag">Sıralama uyumu</th>
+            </tr></thead>
+            <tbody data-draw="dogrulama"></tbody>
+          </table>
+        </div>
+        <p class="f1-not">Pist profili, gelecek yarışları tahmin etmeyi tek başına iyileştirmiyor. Gerçek başlangıç sırası bilindiğinde ise Model 2 en iyisi; sıralama turları bittikten sonra yeniden çalıştırmak tahmini güçlendirir.</p>
+      </section>
+
+      <section class="f1-panel" id="onem-yaris">
+        <h2>Yarış tahmini neye bakıyor?</h2>
+        <p class="f1-not">Başlangıç sırası açık ara en belirleyici bilgi.</p>
+        <div data-draw="onem-yaris" data-source="onem"></div>
+      </section>
+      <section class="f1-panel" id="onem-siralama">
+        <h2>Sıralama turu tahmini neye bakıyor?</h2>
+        <p class="f1-not">Son yarışlardaki grid ve takımın gücü öne çıkıyor.</p>
+        <div data-draw="onem-siralama" data-source="onem"></div>
+      </section>
+
+      <section class="f1-panel f1-genis" id="yontem">
+        <h2>Nasıl hesaplandı?</h2>
+        <ol>
+          <li>2025 ve 2026 sezonlarının tüm yarış sonuçları Jolpica F1 API'den indirildi.</li>
+          <li>Her pistin 6 özelliği tanımlandı: sokak pisti olup olmadığı, hız, aerodinamik yük ihtiyacı, rakım, sollama kolaylığı ve lastik aşınması.</li>
+          <li>Her yarış için, sadece o yarıştan önceki verilerle pilotun formu, takımın gücü, yarış dışı kalma oranı ve 2026'da benzer pistlerdeki performansı hesaplandı.</li>
+          <li>İki Random Forest modeli eğitildi: biri başlangıç sırasını, diğeri başlangıç sırasından bitiriş sırasını tahmin ediyor. 2026 yarışları yeni kurallar nedeniyle 3 kat ağırlık aldı.</li>
+          <li>Kalan her yarışta önce sıralama turu, sonra yarış rastgele oynatıldı. Rastgelelik payı modelin test yarışlarındaki gerçek hatasından alındı; yarış dışı kalma ihtimali de eklendi.</li>
+        </ol>
+        <p class="f1-not">Model kaza, ceza, yağmur, motor değişimi ya da takım talimatı gibi olayları ayrıca bilmiyor; bunlar genel belirsizliğin içinde.</p>
+      </section>
+    </div>
+  </section>
+</div>
+
+<script>
+  window.F1_NSIM = 20000; // model2.py içindeki N_SIM
+  window.F1_TUR = null;   // Yarış yarış sekmesinde seçili tur
+
+  window.f1Yuzde = (p) => (p >= 0.9995 ? '%100' : p > 0 && p < 0.005 ? '<%1' : '%' + Math.round(p * 100));
+  const fmtTarih = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+  window.f1Tarih = (s) => fmtTarih.format(new Date(s));
+
+  window.f1Durum = (el, d, tablo) => {
+    el.classList.toggle('dash-skeleton', d.status === 'loading' && !tablo);
+    if (d.status === 'ok') return true;
+    el.replaceChildren();
+    if (d.status === 'error' || d.status === 'connect') {
+      const m = document.createElement(tablo ? 'tr' : 'div');
+      const h = tablo ? m.appendChild(document.createElement('td')) : m;
+      if (tablo) h.colSpan = 10;
+      h.className = 'f1-hata';
+      h.appendChild(document.createElement('span')).className = 'f1-nokta';
+      h.appendChild(document.createTextNode('Yüklenemedi'));
+      el.appendChild(m);
+    } else if (!tablo) {
+      el.textContent = '—';
+    }
+    return false;
+  };
+
+  // Hücreyi olasılığa göre renklendir
+  window.f1IsiHucre = (td, p) => {
+    td.className = 'f1-hucre';
+    td.textContent = p === 0 ? '·' : f1Yuzde(p);
+    td.style.background = `color-mix(in srgb, ${dash.colors[0]} ${Math.round(Math.min(1, p) * 85)}%, transparent)`;
+    td.style.color = p > 0.55 ? 'var(--color-bg)' : p === 0 ? 'var(--color-fg-muted)' : '';
+  };
+
+  // Satır satır tablo gövdesi
+  window.f1Tablo = (tb, rows, key, cols) => {
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr');
+      tr.dataset.key = key(r);
+      cols.forEach((c) => {
+        const td = tr.appendChild(document.createElement('td'));
+        c(td, r);
+      });
+      return tr;
+    }));
+  };
+
+  // Sekmeler
+  const sekmeAc = (ad) => {
+    document.querySelectorAll('.f1-sekme').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.sekme === ad)));
+    document.querySelectorAll('.f1-bolum').forEach((s) => { s.hidden = s.id !== ad; });
+  };
+  document.querySelectorAll('.f1-sekme').forEach((b) => b.addEventListener('click', () => { sekmeAc(b.dataset.sekme); dash.setLink(b.dataset.sekme); }));
+  const bas = location.hash.slice(1);
+  if (['sampiyonluk', 'yarislar', 'takimlar', 'model'].includes(bas)) sekmeAc(bas);
+
+  dash.calc('ozet', {
+    inputs: ['tahmin', 'kalan'],
+    title: 'Puan farkı ve kalan yarışlar',
+    description: 'Lider ile ikinci arasındaki puan farkı, kalan yarış sayısı ve bu yarışlardan alınabilecek en fazla puan.',
+    fn: (tahmin, kalan) => {
+      const puan = tahmin.map((r) => Number(r.mevcut)).sort((a, b) => b - a);
+      return [{ fark: puan[0] - puan[1], kalan_yaris: kalan.length, max_puan: kalan.length * 25,
+                son_tur: Math.min(...kalan.map((r) => Number(r.tur))) - 1 }];
+    },
+  });
+  dash.calc('ikinci', {
+    inputs: ['tahmin'],
+    title: 'İkinciliğe en yakın pilot',
+    description: 'Sezonu 2. bitirme olasılığı en yüksek pilot ve bu olasılık.',
+    fn: (tahmin) => {
+      const r = tahmin.reduce((a, b) => (Number(b.s2) > Number(a.s2) ? b : a));
+      return [{ pilot: r.pilot, oran: Number(r.s2) }];
+    },
+  });
+</script>
+
+<script>
+  const tek = (ad, kaynak, sec, bicim) => dash.draw(ad, (el) => {
+    const d = dash.data(kaynak);
+    if (!f1Durum(el, d)) return;
+    const r = sec(d.data);
+    el.textContent = r == null ? '—' : bicim(r);
+  });
+  const ilk = (rows) => rows[0];
+  const sayi = (f) => (r) => Number(r[f]).toLocaleString('tr-TR');
+  const yuzde = (f) => (r) => f1Yuzde(Number(r[f]));
+  tek('lider', 'tahmin', ilk, (r) => r.pilot);
+  tek('liderp', 'tahmin', ilk, yuzde('sampiyon'));
+  tek('ikinci', 'ikinci', ilk, (r) => r.pilot);
+  tek('ikincip', 'ikinci', ilk, yuzde('oran'));
+  tek('k-sampiyon', 'tahmin', (rows) => rows.find((r) => r.kod === 'ANT'), yuzde('sampiyon'));
+  tek('k-kesin', 'kesinlesme', ilk, yuzde('toplam'));
+  tek('k-fark', 'ozet', ilk, sayi('fark'));
+  tek('k-kalan', 'ozet', ilk, sayi('kalan_yaris'));
+  tek('k-max', 'ozet', ilk, sayi('max_puan'));
+  tek('sontur', 'ozet', ilk, sayi('son_tur'));
+  dash.draw('nsim', (el) => { el.textContent = F1_NSIM.toLocaleString('tr-TR'); });
+</script>
+
+<script>
+  // Yatay çubuk: bugünkü + beklenen ek + %10–%90 aralığı
+  window.f1Cubuk = (el, rows, etiket) => {
+    el.replaceChildren();
+    const renk = dash.colors[0];
+    el.closest('.f1-panel').style.setProperty('--f1-a', renk);
+    const W = Math.max(280, el.clientWidth);
+    const satir = 30, ust = 8, alt = 26;
+    const H = ust + alt + satir * rows.length;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img');
+    const olc = svg.append('text').attr('font-size', 12);
+    let solW = 0;
+    rows.forEach((r) => { olc.text(r[etiket]); solW = Math.max(solW, olc.node().getComputedTextLength()); });
+    olc.text('≈ 9999'); const sagW = olc.node().getComputedTextLength(); olc.remove();
+    const sol = solW + 12, sag = sagW + 14;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.p90)], [sol, W - sag]).nice();
+    const y = d3.scaleBand(rows.map((r) => r[etiket]), [ust, H - alt]).padding(0.28);
+    const nt = Math.max(2, Math.floor((W - sol - sag) / 80));
+    svg.append('g').selectAll('line').data(x.ticks(nt)).join('line')
+      .attr('x1', x).attr('x2', x).attr('y1', ust).attr('y2', H - alt).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').attr('transform', `translate(0,${H - alt})`).call(d3.axisBottom(x).ticks(nt).tickSize(0).tickPadding(8))
+      .attr('font-size', null).attr('font-family', null)
+      .call((a) => a.select('.domain').attr('stroke', 'var(--cds-chart-axis)'))
+      .call((a) => a.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'));
+    const s = svg.append('g').selectAll('g').data(rows).join('g');
+    const cy = (r) => y(r[etiket]) + y.bandwidth() / 2;
+    s.append('text').attr('x', sol - 10).attr('y', cy).attr('dy', '0.35em').attr('text-anchor', 'end')
+      .attr('fill', 'var(--color-fg)').attr('font-size', 12).text((r) => r[etiket]);
+    s.append('rect').attr('x', x(0)).attr('y', (r) => y(r[etiket])).attr('height', y.bandwidth())
+      .attr('width', (r) => Math.max(0, x(r.beklenen) - x(0))).attr('rx', 3).style('fill', renk).attr('fill-opacity', 0.35);
+    s.append('rect').attr('x', x(0)).attr('y', (r) => y(r[etiket])).attr('height', y.bandwidth())
+      .attr('width', (r) => Math.max(0, x(r.mevcut) - x(0))).attr('rx', 3).style('fill', renk);
+    s.append('line').attr('x1', (r) => x(r.p10)).attr('x2', (r) => x(r.p90)).attr('y1', cy).attr('y2', cy)
+      .attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.5).attr('stroke-linecap', 'round');
+    s.append('text').attr('x', (r) => x(r.p90) + 6).attr('y', cy).attr('dy', '0.35em').attr('fill', 'var(--color-fg-muted)')
+      .attr('font-size', 12).style('font-variant-numeric', 'tabular-nums').text((r) => '≈ ' + Math.round(r.beklenen));
+    const ip = d3.select(el).append('div').attr('class', 'f1-ipucu').style('display', 'none');
+    s.append('rect').attr('x', 0).attr('width', W).attr('y', (r) => y(r[etiket]) - 4).attr('height', y.bandwidth() + 8)
+      .attr('fill', 'transparent')
+      .on('mousemove', (e, r) => {
+        ip.style('display', null).selectAll('*').remove();
+        ip.append('div').attr('class', 'f1-ik').text(r.takim && r.pilot ? `${r.pilot} · ${r.takim}` : r[etiket]);
+        ip.append('div').text(`Bugün: ${r.mevcut} puan`);
+        ip.append('div').text(`Beklenen final: ${Math.round(r.beklenen)} puan`);
+        ip.append('div').text(`%80 aralık: ${r.p10} – ${r.p90}`);
+        if (r.sampiyon != null) ip.append('div').text(`Şampiyonluk: ${f1Yuzde(r.sampiyon)}`);
+        const [mx, my] = d3.pointer(e, el);
+        const w = ip.node().offsetWidth;
+        ip.style('left', Math.min(Math.max(0, mx + 12), el.clientWidth - w) + 'px').style('top', (my + 12) + 'px');
+      })
+      .on('mouseleave', () => ip.style('display', 'none'));
+  };
+  const sayisal = (r) => ({ ...r, mevcut: +r.mevcut, beklenen: +r.beklenen, p10: +r.p10, p90: +r.p90, sampiyon: +r.sampiyon });
+
+  dash.draw('puanlar', (el) => {
+    const d = dash.data('tahmin');
+    if (!f1Durum(el, d)) return;
+    f1Cubuk(el, d.data.slice(0, 10).map(sayisal), 'pilot');
+  });
+  dash.draw('takim-bar', (el) => {
+    const d = dash.data('takimlar');
+    if (!f1Durum(el, d)) return;
+    f1Cubuk(el, d.data.map(sayisal), 'takim');
+  });
+</script>
+
+<script>
+  // Sezon boyunca puan: çizgi grafiği
+  dash.draw('ilerleme', (el) => {
+    const d = dash.data('ilerleme');
+    if (!f1Durum(el, d)) return;
+    el.replaceChildren();
+    const rows = d.data.map((r) => ({ ...r, tur: +r.tur, puan: +r.puan }));
+    const pilotlar = [...new Set(rows.map((r) => r.pilot))];
+    const renk = (i) => dash.colors[i % dash.colors.length];
+    const seri = pilotlar.map((p, i) => {
+      const g = rows.filter((r) => r.pilot === p).sort((a, b) => a.tur - b.tur);
+      const gercek = g.filter((r) => r.tip === 'gercek');
+      return { pilot: p, renk: renk(i), gercek, tahmin: [gercek[gercek.length - 1], ...g.filter((r) => r.tip === 'tahmin')], son: g[g.length - 1] };
+    });
+    const W = Math.max(300, el.clientWidth), H = 340, ust = 10, alt = 28, sol = 40;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Pilotların sezon boyunca toplam puanı');
+    const olc = svg.append('text').attr('font-size', 12);
+    let lw = 0;
+    seri.forEach((s) => { olc.text(`${s.pilot} ${Math.round(s.son.puan)}`); lw = Math.max(lw, olc.node().getComputedTextLength()); });
+    olc.remove();
+    const sag = lw + 12;
+    const x = d3.scaleLinear([1, d3.max(rows, (r) => r.tur)], [sol, W - sag]);
+    const y = d3.scaleLinear([0, d3.max(rows, (r) => r.puan)], [H - alt, ust]).nice();
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line')
+      .attr('x1', sol).attr('x2', W - sag).attr('y1', y).attr('y2', y).attr('stroke', 'var(--cds-chart-grid)');
+    const yAx = svg.append('g').attr('transform', `translate(${sol},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(6));
+    const xAx = svg.append('g').attr('transform', `translate(0,${H - alt})`)
+      .call(d3.axisBottom(x).ticks(Math.min(12, Math.floor((W - sol - sag) / 40))).tickFormat((t) => `${t}`).tickSize(0).tickPadding(8));
+    [yAx, xAx].forEach((a) => a.attr('font-size', null).attr('font-family', null)
+      .call((g) => g.select('.domain').attr('stroke', 'var(--cds-chart-axis)'))
+      .call((g) => g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)')));
+    yAx.select('.domain').remove();
+    // bugün çizgisi
+    const bugun = d3.max(rows.filter((r) => r.tip === 'gercek'), (r) => r.tur);
+    svg.append('line').attr('x1', x(bugun)).attr('x2', x(bugun)).attr('y1', ust).attr('y2', H - alt)
+      .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '3 3');
+    svg.append('text').attr('x', x(bugun) + 4).attr('y', ust + 10).attr('fill', 'var(--color-fg-muted)').attr('font-size', 11).text('Bugün');
+    const cizgi = d3.line().x((r) => x(r.tur)).y((r) => y(r.puan));
+    seri.forEach((s) => {
+      svg.append('path').attr('d', cizgi(s.gercek)).attr('fill', 'none').style('stroke', s.renk).attr('stroke-width', 2)
+        .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+      svg.append('path').attr('d', cizgi(s.tahmin)).attr('fill', 'none').style('stroke', s.renk).attr('stroke-width', 2)
+        .attr('stroke-dasharray', '4 4');
+    });
+    // uç etiketleri, çakışmasın diye aralıklı
+    const uc = seri.map((s) => ({ ...s, yy: y(s.son.puan) })).sort((a, b) => a.yy - b.yy);
+    for (let i = 1; i < uc.length; i++) uc[i].yy = Math.max(uc[i].yy, uc[i - 1].yy + 13);
+    uc.forEach((s) => svg.append('text').attr('x', W - sag + 6).attr('y', s.yy).attr('dy', '0.35em').attr('font-size', 12)
+      .style('fill', s.renk).style('font-variant-numeric', 'tabular-nums').text(`${s.pilot} ${Math.round(s.son.puan)}`));
+    // ipucu
+    const ip = d3.select(el).append('div').attr('class', 'f1-ipucu').style('display', 'none');
+    const kural = svg.append('line').attr('y1', ust).attr('y2', H - alt).attr('stroke', 'var(--cds-chart-axis)').style('display', 'none');
+    svg.append('rect').attr('x', sol).attr('y', ust).attr('width', W - sag - sol).attr('height', H - alt - ust).attr('fill', 'transparent')
+      .on('mousemove', (e) => {
+        const [mx] = d3.pointer(e);
+        const t = Math.round(x.invert(mx));
+        kural.style('display', null).attr('x1', x(t)).attr('x2', x(t));
+        ip.style('display', null).selectAll('*').remove();
+        ip.append('div').attr('class', 'f1-ik').text(`${t}. yarış${t > bugun ? ' (tahmin)' : ''}`);
+        seri.map((s) => ({ s, r: rows.find((r) => r.pilot === s.pilot && r.tur === t) })).filter((o) => o.r)
+          .sort((a, b) => b.r.puan - a.r.puan).forEach(({ s, r }) => {
+            const l = ip.append('div').attr('class', 'f1-sat');
+            l.append('i').attr('class', 'f1-sw').style('background', s.renk);
+            l.append('span').text(`${s.pilot}: ${Math.round(r.puan)}`);
+          });
+        const [px, py] = d3.pointer(e, el);
+        const w = ip.node().offsetWidth;
+        ip.style('left', (px + 14 + w > el.clientWidth ? px - w - 14 : px + 14) + 'px').style('top', Math.max(0, py - 40) + 'px');
+      })
+      .on('mouseleave', () => { ip.style('display', 'none'); kural.style('display', 'none'); });
+  });
+
+  // Puan dağılımı: küçük histogramlar, ortak ölçek
+  dash.draw('dagilim', (el) => {
+    const d = dash.data('dagilim');
+    if (!f1Durum(el, d)) return;
+    el.replaceChildren();
+    const rows = d.data.map((r) => ({ ...r, dilim: +r.dilim, oran: +r.oran }));
+    const pilotlar = [...new Set(rows.map((r) => r.pilot))];
+    const x0 = d3.min(rows, (r) => r.dilim), x1 = d3.max(rows, (r) => r.dilim) + 5;
+    const ymax = d3.max(rows, (r) => r.oran);
+    pilotlar.forEach((p, i) => {
+      const kutu = el.appendChild(document.createElement('div'));
+      kutu.className = 'f1-kucuk';
+      const g = rows.filter((r) => r.pilot === p);
+      const ort = d3.sum(g, (r) => (r.dilim + 2.5) * r.oran) / d3.sum(g, (r) => r.oran);
+      const bas = kutu.appendChild(document.createElement('div'));
+      bas.textContent = `${p} · ortalama ${Math.round(ort)}`;
+      const W = Math.max(180, kutu.clientWidth || 220), H = 70;
+      const x = d3.scaleLinear([x0, x1], [0, W]);
+      const y = d3.scaleLinear([0, ymax], [H - 14, 2]);
+      const svg = d3.select(kutu).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+      svg.selectAll('rect').data(g).join('rect').attr('x', (r) => x(r.dilim) + 0.5).attr('width', Math.max(1, x(x0 + 5) - x(x0) - 1))
+        .attr('y', (r) => y(r.oran)).attr('height', (r) => H - 14 - y(r.oran)).attr('rx', 1)
+        .style('fill', i === 0 ? dash.colors[0] : 'var(--cds-chart-muted)');
+      svg.append('line').attr('x1', 0).attr('x2', W).attr('y1', H - 14).attr('y2', H - 14).attr('stroke', 'var(--cds-chart-axis)');
+      x.ticks(4).forEach((t) => svg.append('text').attr('x', x(t)).attr('y', H - 2).attr('text-anchor', 'middle')
+        .attr('font-size', 10).attr('fill', 'var(--color-fg-muted)').text(t));
+    });
+  });
+</script>
+
+<script>
+  // Tablolar
+  const pct = (f) => (td, r) => f1IsiHucre(td, Number(r[f]));
+  const metin = (f, sag) => (td, r) => { td.textContent = r[f]; if (sag) td.className = 'f1-sag'; };
+  const sag = (fn) => (td, r) => { td.textContent = fn(r); td.className = 'f1-sag'; };
+  Object.assign(window, { f1Pct: pct, f1Metin: metin, f1Sag: sag }); // son betik de kullanıyor
+
+  dash.draw('olasilik', (tb) => {
+    const d = dash.data('tahmin');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data.slice(0, 7), (r) => r.kod, [metin('pilot'), ...['s1', 's2', 's3', 's4', 's5', 's6'].map(pct)]);
+  });
+  dash.draw('kesinlesme', (tb) => {
+    const d = dash.data('kesinlesme');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data, (r) => r.tur, [metin('tur'), metin('yaris'), pct('bu_yarista'), pct('toplam')]);
+  });
+  dash.draw('meksika', (tb) => {
+    const d = dash.data('meksika');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data, (r) => r.sira, [(td, r) => { td.textContent = /^\d+$/.test(r.sira) ? r.sira + '.' : r.sira; },
+      sag((r) => f1Yuzde(Number(r.olasilik))), pct('kesinlesir')]);
+  });
+  dash.draw('takim-tablo', (tb) => {
+    const d = dash.data('takimlar');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data.slice(0, 6), (r) => r.takim, [metin('takim'), metin('mevcut', true),
+      sag((r) => Math.round(Number(r.beklenen))), ...['s1', 's2', 's3', 's4', 's5'].map(pct)]);
+  });
+  dash.draw('dogrulama', (tb) => {
+    const d = dash.data('dogrulama');
+    if (!f1Durum(tb, d, true)) return;
+    const enIyi = d3.max(d.data, (r) => Number(r.spearman));
+    f1Tablo(tb, d.data, (r) => r.yontem, [metin('yontem'), sag((r) => Number(r.mae).toFixed(2)),
+      (td, r) => { td.textContent = Number(r.spearman).toFixed(3); td.className = 'f1-sag';
+                   td.style.fontWeight = Number(r.spearman) === enIyi ? '600' : ''; }]);
+  });
+
+  // Özellik önemi (aşamaya göre)
+  const onemCiz = (asama) => (el) => {
+    const d = dash.data('onem');
+    if (!f1Durum(el, d)) return;
+    const rows = d.data.filter((r) => r.asama === asama).slice(0, 10);
+    const mx = d3.max(rows, (r) => Number(r.onem));
+    el.replaceChildren(...rows.map((r, i) => {
+      const row = document.createElement('div');
+      row.className = 'f1-bar-satir';
+      row.appendChild(document.createElement('span')).textContent = r.ozellik;
+      const iz = row.appendChild(document.createElement('div'));
+      iz.className = 'f1-bar-iz';
+      const dolu = iz.appendChild(document.createElement('div'));
+      dolu.className = 'f1-bar-dolu';
+      dolu.style.width = (Number(r.onem) / mx * 100) + '%';
+      dolu.style.background = i === 0 ? dash.colors[0] : 'var(--cds-chart-muted)';
+      const v = row.appendChild(document.createElement('span'));
+      v.className = 'f1-sag';
+      v.textContent = '%' + Math.round(Number(r.onem) * 100);
+      return row;
+    }));
+  };
+  dash.draw('onem-yaris', onemCiz('Yarış'));
+  dash.draw('onem-siralama', onemCiz('Sıralama turu'));
+</script>
+
+<script>
+  // Yarış yarış sekmesi
+  const seciliTur = (kalanRows) => F1_TUR ?? (kalanRows.length ? Number(kalanRows[0].tur) : null);
+
+  dash.draw('yaris-sec', (el) => {
+    const d = dash.data('kalan');
+    if (!f1Durum(el, d)) return;
+    const t = seciliTur(d.data);
+    el.replaceChildren(...d.data.map((r) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = `${r.yaris.replace(' Grand Prix', '')} · ${f1Tarih(r.tarih)}`;
+      b.setAttribute('aria-pressed', String(Number(r.tur) === t));
+      b.addEventListener('click', () => {
+        window.F1_TUR = Number(r.tur);
+        ['yaris-sec', 'profil', 'yaris-tablo'].forEach((n) => dash.draw(n));
+      });
+      return b;
+    }));
+  });
+
+  dash.draw('profil', (el) => {
+    const d = dash.data('pistler'), k = dash.data('kalan');
+    if (!f1Durum(el, d)) return;
+    const t = seciliTur(k.status === 'ok' ? k.data : d.data);
+    const r = d.data.find((x) => Number(x.tur) === t);
+    if (!r) { el.textContent = '—'; return; }
+    const olcu = [
+      ['Sokak pisti', +r.sokak, 1, (v) => (v >= 1 ? 'Evet' : v > 0 ? 'Yarı sokak' : 'Hayır')],
+      ['Hız', +r.hiz, 3, (v) => ['', 'Düşük', 'Orta', 'Yüksek'][v]],
+      ['Aerodinamik yük', +r.yuk, 3, (v) => ['', 'Düşük', 'Orta', 'Yüksek'][v]],
+      ['Rakım', +r.yukseklik, 2.2, (v) => `${Math.round(v * 1000).toLocaleString('tr-TR')} m`],
+      ['Sollama kolaylığı', +r.sollama, 3, (v) => ['', 'Zor', 'Orta', 'Kolay'][v]],
+      ['Lastik aşınması', +r.asinma, 3, (v) => ['', 'Düşük', 'Orta', 'Yüksek'][v]],
+    ];
+    el.replaceChildren(...olcu.map(([ad, v, mx, f]) => {
+      const o = document.createElement('div');
+      o.className = 'f1-olcer';
+      const u = o.appendChild(document.createElement('div'));
+      u.className = 'f1-olcer-ust';
+      u.appendChild(document.createElement('span')).textContent = ad;
+      u.appendChild(document.createElement('span')).textContent = f(v);
+      const iz = o.appendChild(document.createElement('div'));
+      iz.className = 'f1-bar-iz';
+      const dolu = iz.appendChild(document.createElement('div'));
+      dolu.className = 'f1-bar-dolu';
+      dolu.style.width = Math.max(3, v / mx * 100) + '%';
+      dolu.style.background = dash.colors[0];
+      return o;
+    }));
+  });
+
+  dash.draw('yaris-tablo', (tb) => {
+    const d = dash.data('yarislar'), k = dash.data('kalan');
+    if (!f1Durum(tb, d, true)) return;
+    const t = seciliTur(k.status === 'ok' ? k.data : []) ?? Number(d.data[0].tur);
+    const rows = d.data.filter((r) => Number(r.tur) === t).slice(0, 12);
+    f1Tablo(tb, rows, (r) => `${r.tur},${r.kod}`, [
+      f1Metin('pilot'), f1Sag((r) => Number(r.grid_bek).toFixed(1)), f1Pct('pole'), f1Pct('kazanma'), f1Pct('podyum'),
+      f1Pct('puan_alma'), f1Sag((r) => f1Yuzde(Number(r.dnf))), f1Sag((r) => Number(r.beklenen_puan).toFixed(1)),
+      (td, r) => { const v = Number(r.pist_etkisi); td.className = 'f1-sag';
+                   td.textContent = Math.abs(v) < 0.05 ? '0' : (v > 0 ? '+' : '−') + Math.abs(v).toFixed(1);
+                   td.style.color = v > 0.3 ? 'var(--color-ok)' : v < -0.3 ? 'var(--color-bad)' : ''; },
+    ]);
+  });
+
+  // Isı haritası: pilot × yarış kazanma olasılığı
+  dash.draw('kazanma-isi', (el) => {
+    const d = dash.data('yarislar');
+    if (!f1Durum(el, d)) return;
+    const turlar = [...new Set(d.data.map((r) => Number(r.tur)))].sort((a, b) => a - b);
+    const ad = Object.fromEntries(d.data.map((r) => [Number(r.tur), r.yaris]));
+    const pilotlar = [...new Set(d.data.map((r) => r.pilot))].slice(0, 10);
+    const tbl = document.createElement('table');
+    const hr = tbl.createTHead().insertRow();
+    hr.appendChild(document.createElement('th')).textContent = 'Pilot';
+    turlar.forEach((t) => { const th = hr.appendChild(document.createElement('th')); th.textContent = ad[t]; th.className = 'f1-sag'; });
+    const th = hr.appendChild(document.createElement('th')); th.textContent = 'Beklenen galibiyet'; th.className = 'f1-sag';
+    const tb = tbl.createTBody();
+    pilotlar.forEach((p) => {
+      const tr = tb.insertRow();
+      tr.insertCell().textContent = p;
+      let top = 0;
+      turlar.forEach((t) => {
+        const r = d.data.find((x) => x.pilot === p && Number(x.tur) === t);
+        const v = r ? Number(r.kazanma) : 0;
+        top += v;
+        f1IsiHucre(tr.insertCell(), v);
+      });
+      const c = tr.insertCell(); c.className = 'f1-sag'; c.textContent = top.toFixed(1);
+    });
+    el.replaceChildren(tbl);
+  });
+</script>

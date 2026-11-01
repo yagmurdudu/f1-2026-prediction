@@ -1,0 +1,48 @@
+season,round,race,circuit,date,sprint
+2025,1,Australian Grand Prix,albert_park,2025-03-16,False
+2025,2,Chinese Grand Prix,shanghai,2025-03-23,True
+2025,3,Japanese Grand Prix,suzuka,2025-04-06,False
+2025,4,Bahrain Grand Prix,bahrain,2025-04-13,False
+2025,5,Saudi Arabian Grand Prix,jeddah,2025-04-20,False
+2025,6,Miami Grand Prix,miami,2025-05-04,True
+2025,7,Emilia Romagna Grand Prix,imola,2025-05-18,False
+2025,8,Monaco Grand Prix,monaco,2025-05-25,False
+2025,9,Spanish Grand Prix,catalunya,2025-06-01,False
+2025,10,Canadian Grand Prix,villeneuve,2025-06-15,False
+2025,11,Austrian Grand Prix,red_bull_ring,2025-06-29,False
+2025,12,British Grand Prix,silverstone,2025-07-06,False
+2025,13,Belgian Grand Prix,spa,2025-07-27,True
+2025,14,Hungarian Grand Prix,hungaroring,2025-08-03,False
+2025,15,Dutch Grand Prix,zandvoort,2025-08-31,False
+2025,16,Italian Grand Prix,monza,2025-09-07,False
+2025,17,Azerbaijan Grand Prix,baku,2025-09-21,False
+2025,18,Singapore Grand Prix,marina_bay,2025-10-05,False
+2025,19,United States Grand Prix,americas,2025-10-19,True
+2025,20,Mexico City Grand Prix,rodriguez,2025-10-26,False
+2025,21,São Paulo Grand Prix,interlagos,2025-11-09,True
+2025,22,Las Vegas Grand Prix,vegas,2025-11-23,False
+2025,23,Qatar Grand Prix,losail,2025-11-30,True
+2025,24,Abu Dhabi Grand Prix,yas_marina,2025-12-07,False
+2026,1,Australian Grand Prix,albert_park,2026-03-08,False
+2026,2,Chinese Grand Prix,shanghai,2026-03-15,True
+2026,3,Japanese Grand Prix,suzuka,2026-03-29,False
+2026,4,Miami Grand Prix,miami,2026-05-03,True
+2026,5,Canadian Grand Prix,villeneuve,2026-05-24,True
+2026,6,Monaco Grand Prix,monaco,2026-06-07,False
+2026,7,Barcelona Grand Prix,catalunya,2026-06-14,False
+2026,8,Austrian Grand Prix,red_bull_ring,2026-06-28,False
+2026,9,British Grand Prix,silverstone,2026-07-05,True
+2026,10,Belgian Grand Prix,spa,2026-07-19,False
+2026,11,Hungarian Grand Prix,hungaroring,2026-07-26,False
+2026,12,Dutch Grand Prix,zandvoort,2026-08-23,True
+2026,13,Italian Grand Prix,monza,2026-09-06,False
+2026,14,Spanish Grand Prix,madring,2026-09-13,False
+2026,15,Azerbaijan Grand Prix,baku,2026-09-26,False
+2026,16,Bahrain Grand Prix in Malaysia,sepang,2026-10-04,False
+2026,17,Singapore Grand Prix,marina_bay,2026-10-11,True
+2026,18,United States Grand Prix,americas,2026-10-25,False
+2026,19,Mexico City Grand Prix,rodriguez,2026-11-01,False
+2026,20,Brazilian Grand Prix,interlagos,2026-11-08,False
+2026,21,Las Vegas Grand Prix,vegas,2026-11-22,False
+2026,22,Qatar Grand Prix,losail,2026-11-29,False
+2026,23,Abu Dhabi Grand Prix,yas_marina,2026-12-06,False
