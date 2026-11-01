@@ -81,4 +81,8 @@ for r in k.itertuples():
     ad = r.pilot.replace("*", "") + ("" if r.bitirdi else " (DNF)")
     f = "✓" if r.fark == 0 else str(abs(int(r.fark)))
     print(f"| {r.gercek} | {ad} | {r.grid} | {r.tahmini_bitis} | {f} |")
-print(f"\nKaydedildi: {CIKTI}")
+# web sitesi de güncellensin
+import os, shutil
+if os.path.isdir("docs/data"):
+    shutil.copyfile(CIKTI, "docs/data/meksika_yaris_karsilastirma.csv")
+print(f"\nKaydedildi: {CIKTI} (ve docs/data/ içine kopyalandı)")

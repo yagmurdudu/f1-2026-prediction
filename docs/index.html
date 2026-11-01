@@ -1,7 +1,125 @@
-<meta name="dash-one-writer">
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>F1 2026 Tahmin</title>
+<meta name="description" content="F1 2026 şampiyonluk, sıralama turu ve yarış tahminleri: Random Forest modelleri ve 20.000 sezonluk Monte Carlo simülasyonu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
 <style>
-  .f1 { display: flex; flex-direction: column; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); }
-  .f1 h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  /* Sayfa: tek sütun, geniş ekranda 1200px; kartlar ve sekmeler. */
+  :root {
+    --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --color-bg: #f5f6f8; --color-panel: #ffffff; --color-fg: #151821; --color-fg-muted: #5c6373;
+    --color-border-line: #e1e4ea; --color-ok: #23803a; --color-warn: #b86e00; --color-bad: #c92a52;
+    --cds-text-secondary: #5c6373; --cds-surface-popover: #ffffff; --cds-border: #d5d9e1;
+    --cds-shadow-popover: 0 6px 20px rgba(20, 24, 33, .12);
+    --cds-chart-grid: #eceef2; --cds-chart-axis: #c4c9d3; --cds-chart-reference: #9aa1af; --cds-chart-muted: #c7ccd6;
+    --cds-font-size-caption: .8125rem; --cds-font-size-body: .9375rem; --cds-font-size-heading: 1.0625rem; --cds-font-size-title: 2rem;
+    --cds-font-weight-medium: 500;
+    --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 14px; --cds-gap-lg: 20px; --cds-gap-xl: 32px;
+    --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 18px;
+    --cds-radius: 8px; --cds-dur-slow: .3s;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --color-bg: #0e1016; --color-panel: #161922; --color-fg: #e7e9ef; --color-fg-muted: #9aa1b1;
+    --color-border-line: #272b36; --color-ok: #6bd383; --color-warn: #f0b44c; --color-bad: #ff7a98;
+    --cds-text-secondary: #9aa1b1; --cds-surface-popover: #1d212b; --cds-border: #323744;
+    --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, .45);
+    --cds-chart-grid: #222632; --cds-chart-axis: #3a4050; --cds-chart-reference: #6b7283; --cds-chart-muted: #3d4352;
+    color-scheme: dark;
+  } }
+  :root[data-theme="dark"] {
+    --color-bg: #0e1016; --color-panel: #161922; --color-fg: #e7e9ef; --color-fg-muted: #9aa1b1;
+    --color-border-line: #272b36; --color-ok: #6bd383; --color-warn: #f0b44c; --color-bad: #ff7a98;
+    --cds-text-secondary: #9aa1b1; --cds-surface-popover: #1d212b; --cds-border: #323744;
+    --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, .45);
+    --cds-chart-grid: #222632; --cds-chart-axis: #3a4050; --cds-chart-reference: #6b7283; --cds-chart-muted: #3d4352;
+    color-scheme: dark;
+  }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body { background: var(--color-bg); color: var(--color-fg); font-family: var(--font-sans); font-size: var(--cds-font-size-body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .sayfa { max-width: 1200px; margin-inline: auto; padding-block: 32px 48px;
+           padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  @media (min-width: 720px) { .sayfa { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+  .dash-skeleton { color: transparent !important; background: linear-gradient(90deg, var(--color-border-line), var(--cds-chart-grid), var(--color-border-line)); background-size: 200% 100%; border-radius: 6px; min-height: 1em; display: inline-block; min-width: 4ch; }
+  @media (prefers-reduced-motion: no-preference) { .dash-skeleton { animation: parilti 1.2s linear infinite; } }
+  @keyframes parilti { to { background-position: -200% 0; } }
+  td.dash-skeleton, tbody.dash-skeleton { display: table-row-group; }
+  .alt { margin-top: var(--cds-gap-xl); padding-top: var(--cds-gap-lg); border-top: 1px solid var(--color-border-line); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-lg); }
+  .alt a, .f1 a { color: inherit; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+  // Küçük veri katmanı: CSV dosyalarını yükler, hesaplamaları ve çizimleri yönetir.
+  (function () {
+    const KAYNAK = {
+      tahmin: 'data/m2_tahmin.csv', kalan: 'data/m2_kalan.csv', dogrulama: 'data/m2_dogrulama.csv',
+      onem: 'data/m2_onem.csv', yarislar: 'data/m2_yarislar.csv', pistler: 'data/m2_pistler.csv',
+      ilerleme: 'data/m2_ilerleme.csv', takimlar: 'data/m2_takimlar.csv', dagilim: 'data/m2_dagilim.csv',
+      kesinlesme: 'data/m2_kesinlesme.csv', meksika: 'data/m2_meksika.csv',
+      m_siralama: 'data/meksika_siralama_karsilastirma.csv', m_yaris: 'data/meksika_yaris_tahmini.csv',
+      m_yaris_gercek: 'data/meksika_yaris_karsilastirma.csv',
+    };
+    const ACIK = ['#2f6bd8', '#d9480f', '#23803a', '#9c36b5', '#c77700', '#0b7f91', '#c2255c', '#5468d4'];
+    const KOYU = ['#6f9dff', '#ff8a4c', '#5fd37a', '#d07ef0', '#ffc04d', '#3fc6dc', '#f06595', '#94a6ff'];
+    const koyuMu = () => document.documentElement.dataset.theme === 'dark' ||
+      (document.documentElement.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    const durum = {}, hesap = {}, cizim = {};
+    Object.keys(KAYNAK).forEach((k) => { durum[k] = { status: 'loading', data: [] }; });
+    const ciz = (ad) => {
+      const fn = cizim[ad];
+      if (!fn) return;
+      document.querySelectorAll(`[data-draw="${ad}"]`).forEach((el) => {
+        if (el.closest('[hidden]')) return;
+        try { fn(el); } catch (e) { console.error(ad, e); }
+      });
+    };
+    const dash = {
+      colors: koyuMu() ? KOYU : ACIK,
+      data: (id) => (hesap[id] ? hesap[id].sonuc : durum[id] || { status: 'missing', data: [] }),
+      calc: (id, { inputs, fn }) => { hesap[id] = { inputs, fn, sonuc: { status: 'loading', data: [] } }; },
+      draw: (ad, fn) => { if (fn) cizim[ad] = fn; else ciz(ad); },
+      setLink: (ad) => history.replaceState(null, '', '#' + ad),
+      yenidenCiz: () => Object.keys(cizim).forEach(ciz),
+    };
+    window.dash = dash;
+    const hesapla = () => {
+      Object.values(hesap).forEach((h) => {
+        const g = h.inputs.map((i) => dash.data(i));
+        if (g.every((x) => x.status === 'ok')) {
+          try { h.sonuc = { status: 'ok', data: h.fn(...g.map((x) => x.data)) }; }
+          catch (e) { console.error(e); h.sonuc = { status: 'error', data: [] }; }
+        } else if (g.some((x) => x.status !== 'loading')) h.sonuc = { status: 'error', data: [] };
+      });
+    };
+    const yukle = async () => {
+      await Promise.all(Object.entries(KAYNAK).map(async ([id, url]) => {
+        try {
+          const r = await fetch(url, { cache: 'no-cache' });
+          durum[id] = r.ok ? { status: 'ok', data: d3.csvParse(await r.text()) }
+                           : { status: r.status === 404 ? 'missing' : 'error', data: [] };
+        } catch (e) { durum[id] = { status: 'error', data: [] }; }
+      }));
+      hesapla();
+      dash.yenidenCiz();
+    };
+    document.addEventListener('DOMContentLoaded', () => { dash.yenidenCiz(); yukle(); });
+    let zaman;
+    addEventListener('resize', () => { clearTimeout(zaman); zaman = setTimeout(dash.yenidenCiz, 150); });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { dash.colors = koyuMu() ? KOYU : ACIK; dash.yenidenCiz(); });
+  })();
+</script>
+</head>
+<body>
+<main class="sayfa">
+<style>
+  .f1 { display: flex; flex-direction: column; gap: var(--cds-gap-xl); font-family: var(--font-sans); }
+  .f1 h1 { font-family: var(--font-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
   .f1 h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
   .f1 h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
   .f1 p { margin: 0; max-width: 72ch; }
@@ -16,7 +134,7 @@
   .f1 .f1-kartlar { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
   .f1 .f1-kart, .f1 .f1-panel { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
   .f1 .f1-etiket { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
-  .f1 .f1-sayi { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .f1 .f1-sayi { font-family: var(--font-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.1; }
   .f1 .f1-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
   .f1 .f1-genis { grid-column: 1 / -1; }
   .f1 .f1-cizim { position: relative; min-height: 300px; }
@@ -66,6 +184,7 @@
 
   <nav class="f1-sekmeler" role="tablist" aria-label="Bölümler">
     <button class="f1-sekme" role="tab" type="button" id="sekme-sampiyonluk" data-sekme="sampiyonluk" aria-selected="true">Şampiyonluk</button>
+    <button class="f1-sekme" role="tab" type="button" id="sekme-meksika-gp" data-sekme="meksika-gp" aria-selected="false">Meksika GP</button>
     <button class="f1-sekme" role="tab" type="button" id="sekme-yarislar" data-sekme="yarislar" aria-selected="false">Yarış yarış</button>
     <button class="f1-sekme" role="tab" type="button" id="sekme-takimlar" data-sekme="takimlar" aria-selected="false">Takımlar</button>
     <button class="f1-sekme" role="tab" type="button" id="sekme-model" data-sekme="model" aria-selected="false">Model</button>
@@ -172,6 +291,65 @@
         <h2>Sezon sonu puan dağılımı</h2>
         <p class="f1-not">Simülasyonlarda her pilotun bitirdiği puan. Hepsi aynı ölçekte; üst üste binen dağılımlar sıralamanın belirsiz olduğunu gösteriyor.</p>
         <div class="f1-kucukler" data-draw="dagilim" data-source="dagilim"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= MEKSİKA GP ================= -->
+  <section class="f1-bolum" id="meksika-gp" role="tabpanel" aria-labelledby="sekme-meksika-gp" hidden>
+    <div class="f1-ust">
+      <h2>Meksika GP 2026: tahmin ve gerçek</h2>
+      <p class="f1-not">Tahminler oturumlardan önce yapıldı ve GitHub'a kaydedildi. Sıralama turu 31 Ekim, yarış 1 Kasım 2026. Haas'ta Ocon yerine yarışan Hirakawa, modelde Ocon'un verileriyle temsil edildi.</p>
+    </div>
+    <div class="f1-kartlar">
+      <div class="f1-kart">
+        <span class="f1-etiket">Sıralama: tahmin ile gerçeğin uyumu (1 kusursuz)</span>
+        <span class="f1-sayi" data-draw="m-uyum">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Sıralama: ortalama sıra hatası</span>
+        <span class="f1-sayi" data-draw="m-hata">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Q3'e kalan 10 pilottan doğru bilinen</span>
+        <span class="f1-sayi" data-draw="m-q3">—</span>
+      </div>
+      <div class="f1-kart">
+        <span class="f1-etiket">Yarış favorisi (kazanma olasılığı)</span>
+        <span class="f1-sayi" data-draw="m-favori">—</span>
+      </div>
+    </div>
+
+    <div class="f1-izgara">
+      <section class="f1-panel f1-genis" id="m-yaris-gercek">
+        <h2>Yarış: tahmin ve gerçek</h2>
+        <div data-draw="m-yaris-gercek"></div>
+      </section>
+
+      <section class="f1-panel" id="m-siralama">
+        <h2>Sıralama turu: tahmin ve gerçek</h2>
+        <p class="f1-not">Model, pole zamanına yüzde kaç uzak kalınacağını tahmin etti. Fark: tahmin ile gerçek sıra arası.</p>
+        <div class="f1-kaydir">
+          <table>
+            <thead><tr>
+              <th class="f1-sag">Gerçek</th><th>Pilot</th><th class="f1-sag">Tahmin</th><th class="f1-sag">Fark</th><th class="f1-sag">Pole olasılığı</th>
+            </tr></thead>
+            <tbody data-draw="m-siralama-tablo"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="f1-panel" id="m-yaris">
+        <h2>Yarış tahmini (gerçek başlangıç sırasıyla)</h2>
+        <p class="f1-not">Kaydedildi: <span data-draw="m-zaman">—</span> UTC, yarıştan önce. Yarışı bitiremeyen pilot o simülasyonda en sona yazıldı.</p>
+        <div class="f1-kaydir">
+          <table>
+            <thead><tr>
+              <th class="f1-sag">Tahmin</th><th>Pilot</th><th class="f1-sag">Başlangıç</th><th class="f1-sag">Kazanma</th><th class="f1-sag">Podyum</th><th class="f1-sag">Puan alma</th><th class="f1-sag">Yarış dışı</th>
+            </tr></thead>
+            <tbody data-draw="m-yaris-tablo"></tbody>
+          </table>
+        </div>
       </section>
     </div>
   </section>
@@ -341,10 +519,11 @@
   const sekmeAc = (ad) => {
     document.querySelectorAll('.f1-sekme').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.sekme === ad)));
     document.querySelectorAll('.f1-bolum').forEach((s) => { s.hidden = s.id !== ad; });
+    dash.yenidenCiz();
   };
   document.querySelectorAll('.f1-sekme').forEach((b) => b.addEventListener('click', () => { sekmeAc(b.dataset.sekme); dash.setLink(b.dataset.sekme); }));
   const bas = location.hash.slice(1);
-  if (['sampiyonluk', 'yarislar', 'takimlar', 'model'].includes(bas)) sekmeAc(bas);
+  if (['sampiyonluk', 'meksika-gp', 'yarislar', 'takimlar', 'model'].includes(bas)) sekmeAc(bas);
 
   dash.calc('ozet', {
     inputs: ['tahmin', 'kalan'],
@@ -717,3 +896,100 @@
     el.replaceChildren(tbl);
   });
 </script>
+
+<script>
+  // Meksika GP sekmesi
+  const sira = (a) => { const s = a.map((v, i) => [v, i]).sort((x, y) => x[0] - y[0]); const r = Array(a.length);
+    s.forEach(([, i], k) => { r[i] = k + 1; }); return r; };
+  const pearson = (a, b) => { const ma = d3.mean(a), mb = d3.mean(b);
+    return d3.sum(a, (v, i) => (v - ma) * (b[i] - mb)) / Math.sqrt(d3.sum(a, (v) => (v - ma) ** 2) * d3.sum(b, (v) => (v - mb) ** 2)); };
+  dash.calc('m_siralama_ozet', {
+    inputs: ['m_siralama'],
+    fn: (rows) => {
+      const r = rows.filter((x) => x.kod !== 'OCO');
+      const t = sira(r.map((x) => +x.tahmin_sira)), g = sira(r.map((x) => +x.gercek_sira));
+      return [{ uyum: pearson(t, g), hata: d3.mean(t, (v, i) => Math.abs(v - g[i])),
+                q3: rows.filter((x) => +x.tahmin_sira <= 10 && +x.gercek_sira <= 10).length }];
+    },
+  });
+  const tekM = (ad, kaynak, bicim) => dash.draw(ad, (el) => {
+    const d = dash.data(kaynak);
+    if (!f1Durum(el, d)) return;
+    el.textContent = bicim(d.data);
+  });
+  tekM('m-uyum', 'm_siralama_ozet', (r) => r[0].uyum.toFixed(2));
+  tekM('m-hata', 'm_siralama_ozet', (r) => r[0].hata.toFixed(1) + ' sıra');
+  tekM('m-q3', 'm_siralama_ozet', (r) => `${r[0].q3} / 10`);
+  tekM('m-favori', 'm_yaris', (r) => { const f = r.reduce((a, b) => (+b.kazanma > +a.kazanma ? b : a));
+    return `${f.pilot} ${f1Yuzde(+f.kazanma)}`; });
+  tekM('m-zaman', 'm_yaris', (r) => r[0].tahmin_zamani_utc);
+  const farkHucre = (td, v) => { td.className = 'f1-sag'; td.textContent = v === 0 ? '✓' : String(Math.abs(v));
+    td.style.color = v === 0 ? 'var(--color-ok)' : Math.abs(v) >= 4 ? 'var(--color-bad)' : ''; };
+  const ad = (r) => (r.kod === 'OCO' ? 'Hirakawa' : String(r.pilot).replace('*', ''));
+
+  dash.draw('m-siralama-tablo', (tb) => {
+    const d = dash.data('m_siralama');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data, (r) => r.kod, [
+      (td, r) => { td.className = 'f1-sag'; td.textContent = r.gercek_sira; },
+      (td, r) => { td.textContent = ad(r); },
+      (td, r) => { td.className = 'f1-sag'; td.textContent = r.kod === 'OCO' ? '–' : r.tahmin_sira; },
+      (td, r) => (r.kod === 'OCO' ? (td.textContent = '–', td.className = 'f1-sag') : farkHucre(td, +r.fark)),
+      (td, r) => f1IsiHucre(td, +r.pole),
+    ]);
+  });
+  dash.draw('m-yaris-tablo', (tb) => {
+    const d = dash.data('m_yaris');
+    if (!f1Durum(tb, d, true)) return;
+    f1Tablo(tb, d.data, (r) => r.kod, [
+      (td, r) => { td.className = 'f1-sag'; td.textContent = r.tahmini_bitis; },
+      (td, r) => { td.textContent = ad(r); },
+      (td, r) => { td.className = 'f1-sag'; td.textContent = r.grid; },
+      (td, r) => f1IsiHucre(td, +r.kazanma), (td, r) => f1IsiHucre(td, +r.podyum), (td, r) => f1IsiHucre(td, +r.puan_alma),
+      (td, r) => { td.className = 'f1-sag'; td.textContent = f1Yuzde(+r.dnf); },
+    ]);
+  });
+  dash.draw('m-yaris-gercek', (el) => {
+    const d = dash.data('m_yaris_gercek');
+    el.replaceChildren();
+    if (d.status === 'loading') { el.className = 'dash-skeleton'; return; }
+    el.className = '';
+    if (d.status !== 'ok') {
+      const p = el.appendChild(document.createElement('p'));
+      p.className = 'f1-not';
+      p.textContent = 'Yarış bittikten sonra burada tahmin ile gerçek sonuç yan yana gösterilecek.';
+      return;
+    }
+    const k = d.data;
+    const kazanan = k.find((r) => +r.gercek === 1);
+    const ozet = el.appendChild(document.createElement('p'));
+    const t = sira(k.map((r) => +r.tahmini_bitis)), g = sira(k.map((r) => +r.gercek)), gr = sira(k.map((r) => +r.grid));
+    const podyum = k.filter((r) => +r.gercek <= 3 && +r.tahmini_bitis <= 3).length;
+    ozet.textContent = `Kazanan: ${ad(kazanan)} (modelin verdiği olasılık ${f1Yuzde(+kazanan.kazanma)}). `
+      + `Podyumda ${podyum}/3 doğru. Sıralama uyumu ${pearson(t, g).toFixed(2)}; `
+      + `"herkes başladığı sırada bitirir" yönteminin uyumu ${pearson(gr, g).toFixed(2)}.`;
+    const kutu = el.appendChild(document.createElement('div'));
+    kutu.className = 'f1-kaydir';
+    const tbl = kutu.appendChild(document.createElement('table'));
+    const hr = tbl.createTHead().insertRow();
+    [['Gerçek', 1], ['Pilot', 0], ['Başlangıç', 1], ['Tahmin', 1], ['Fark', 1], ['Kazanma olasılığı', 1], ['Yarış dışı olasılığı', 1]]
+      .forEach(([m, s]) => { const th = hr.appendChild(document.createElement('th')); th.textContent = m; if (s) th.className = 'f1-sag'; });
+    const tb = tbl.createTBody();
+    k.forEach((r) => {
+      const tr = tb.insertRow();
+      const bitirdi = String(r.bitirdi) === 'True';
+      const c = (v, s) => { const td = tr.insertCell(); td.textContent = v; if (s) td.className = 'f1-sag'; return td; };
+      c(r.gercek, 1); c(ad(r) + (bitirdi ? '' : ' (DNF)')); c(r.grid, 1); c(r.tahmini_bitis, 1);
+      farkHucre(tr.insertCell(), +r.fark); f1IsiHucre(tr.insertCell(), +r.kazanma); c(f1Yuzde(+r.dnf), 1);
+    });
+  });
+</script>
+
+<footer class="alt">
+  <span>Veri: <a href="https://github.com/jolpica/jolpica-f1">Jolpica F1 API</a> (Ergast uyumlu)</span>
+  <span>Kod ve modeller: <a href="https://github.com/yagmurdudu/f1-2026-prediction">github.com/yagmurdudu/f1-2026-prediction</a></span>
+  <span>Puanlar ABD GP (18. yarış) sonrası. Tahminler resmi değildir.</span>
+</footer>
+</main>
+</body>
+</html>

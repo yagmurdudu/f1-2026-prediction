@@ -5,6 +5,3 @@ __pycache__/
 
 # macOS
 .DS_Store
-
-# Yayındaki sayfaya yükleme için kullanılan geçici kopya
-sayfa/index.json

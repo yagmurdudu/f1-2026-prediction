@@ -1,0 +1,6 @@
+yontem,mae,spearman
+Son 6 yarış ortalaması,3.26,0.709
+Model 1 (pist bilgisi yok),3.29,0.73
+Model 2 (pist profili + tahmini grid),3.35,0.701
+"Model 2, gerçek grid ile",3.21,0.744
+Model 1 + Model 2 ortalaması,3.3,0.72

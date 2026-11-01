@@ -1,7 +1,7 @@
 # F1 2026 Şampiyonluk Tahmini
 
 Makine öğrenmesiyle F1 2026 pilotlar ve takımlar şampiyonası, sıralama turu ve yarış tahmini.
-Yayındaki sayfa: https://claude.ai/artifact/4CzEgtMDUpH9TggSVEvGtx
+**Web sitesi: https://yagmurdudu.github.io/f1-2026-prediction/**
 
 ## Gerçek bir yarış hafta sonunda deneme: Meksika GP 2026
 
@@ -92,7 +92,8 @@ Sadece model testini görmek için: `./venv/bin/python model2.py --sadece-test`
 | `meksika_2026/` | Meksika GP tahminleri, gerçek sonuçlar ve karşılaştırmalar |
 | `data/m2_*.csv` | Model 2 çıktıları; sayfadaki her tablo ve grafik bunlardan |
 | `data/*.csv` (m2_ olmayanlar) | Model 1 çıktıları |
-| `sayfa/index.html` | Yayındaki sayfanın kodu |
+| `docs/` | Web sitesi (GitHub Pages). Veriler `docs/data/` içinde |
+| `site_verisi.py` | Model çıktılarını sitenin `docs/data/` klasörüne kopyalar |
 
 ## Model 2 kısaca
 
@@ -111,4 +112,12 @@ Sadece model testini görmek için: `./venv/bin/python model2.py --sadece-test`
 | Model 2 (tahmini grid) | 3.35 | 0.701 |
 | Model 2 (gerçek grid) | 3.21 | 0.744 |
 
-Sayfayı güncellemek için yeni CSV'lerin yayındaki sayfaya yüklenmesi gerekir; bunu Claude'dan isteyebilirsin.
+Siteyi güncellemek için modelleri çalıştırdıktan sonra `./venv/bin/python site_verisi.py` çalıştırıp değişiklikleri GitHub'a gönder.
+
+Siteyi yerelde açmak için:
+
+```bash
+python3 -m http.server 8000 -d docs
+```
+
+Sonra tarayıcıda http://localhost:8000 adresini aç.
